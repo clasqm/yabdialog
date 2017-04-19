@@ -23,3 +23,6 @@ requires {
 urls {
 				http://clasquin-johnson.co.za/michel/haiku
 }
+source-urls {
+				https://github.com/clasqm/yabdialog
+}
