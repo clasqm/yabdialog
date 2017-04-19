@@ -1,0 +1,11 @@
+#!/bin/sh
+cd /boot/home/projects/yabdialog/PackagingFolder
+package create -b yabdialog_0.2-1_gcc2.hpkg
+sleep 0.5
+package add yabdialog_0.2-1_gcc2.hpkg data bin
+sleep 0.5
+addattr BeShare:Info "A CLI utility to create Haiku widgets" yabdialog_0.2-1_gcc2.hpkg
+becopy yabdialog_0.2-1_gcc2.hpkg "/Storage/Haiku/My ports"
+mv yabdialog_0.2-1_gcc2.hpkg /boot/home/projects/repo2
+
+sync

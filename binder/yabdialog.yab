@@ -1,0 +1,933 @@
+#!yab
+################################
+############# Prologue #############
+################################
+
+//Yabadabbadoo notification
+########DO NOT RENAME THIS FILE!########
+//Yabadabbadoo needs it to function.
+
+//The app formerly know as hdialog, until I found out that someone else wanted to use that name.
+//The other one is far more compatible with xdialog, it seems, so I don't mind changing mine.
+ 
+##Fill in these fields with your own particulars.
+##The variables will be used in the About Box and in naming the program.
+ 
+ProgramName$ = "yabdialog"
+AuthorName$ = "Michel Clasquin-Johnson <clasqm@gmail.com>"
+ProgramVersion$ = "v0.1"
+ProgramBriefDescription$ = "A CLI program to create alerts and dialog boxes. Like xdialog in Linux or CocoaDialog in OSX, but not compatible with either. Use the command\n\tyabdialog --help\nfor instructions on usage, or the command\n\tyabdialog --help > yabdialog.txt\nto save instructions to a text file.\nTo see a demo, use the command\n\tyabdialog-demo"
+ProgramLicense$ = "Public Domain, 2014"
+//ProgramAcknowledgements$ ="With thanks to ......."
+ 
+//*************************
+//*****Global Variables****
+//*************************
+ 
+## Technically, yab does not require you to declare global variables,
+##It just is a really, really good idea to do it anyway.
+// set DEBUG = 1 to print out all messages on the console
+DEBUG = 0
+//change this to DEBUG = 0 when you are ready to bind the program for distribution
+tempval$=""
+totalargs = 0 
+dim a$(10) 
+ScreenW = 1024 
+ScreenH = 768
+ScreenPosX = 0
+ScreenPosY = 0
+Quadrant = 0 //centred as default 
+AllDesktops = 0
+ConfigFile$ = "/boot/home/config/settings/yabdialog.cfg"
+ProgressBarExist = 0
+radio = 0
+
+ 
+##########################
+######Preliminary Commands#####
+##########################
+
+## Commands to run before the Main Loop come here.
+## e.g. setting up a window with a menu.
+
+if (not open(1,ConfigFile$)) then
+	red=216
+	green=216
+	blue=216
+else
+	line input #1 tempval$: red = val(tempval$)
+	line input #1 tempval$: green = val(tempval$)
+	line input #1 tempval$: blue = val(tempval$)
+	tempval$=""
+endif
+close #1
+
+totalargs = peek("argument") 
+
+if totalargs >10 dim a$(totalargs) //only using 6 so far 
+if totalargs = 0 then
+	a$(1) = "--about"
+else
+	for f = 1 to totalargs
+		a$(f) = peek$("argument")
+	next f
+ endif
+ if lower$(a$(1)) = "--help" or lower$(a$(1)) = "-h" ShowHelp()
+// if lower$(a$(1)) = "--about" ShowAbout()
+
+WhatWidget()
+  
+#######End of Prologue#######
+
+
+//Yabadabbadoo notification
+########DO NOT RENAME THIS FILE!########
+//Yabadabbadoo needs it to function.
+
+//Main Message Loop
+dim msg$(1)
+while(not leavingLoop)
+	nCommands = token(message$, msg$(), "|")
+	for everyCommand = 1 to nCommands
+		if(DEBUG and msg$(everyCommand)<>"") print msg$(everyCommand)
+		switch(msg$(everyCommand))
+			case "_QuitRequested"
+				exit 1
+				break
+			case "SimpleAlertButton"
+				window close "SimpleAlertWindow"
+				exit 0
+				break
+			case "YesButton"
+				print "yes"
+				exit 0
+				break
+			case "NoButton"
+				print "no"
+				exit 0
+				break
+			case "OKButton"
+				print "ok"
+				exit 0
+				break
+			case "CancelButton"
+				print "cancel"
+				exit 0
+				break
+			case "EditorWindow:_QuitRequested"
+				window close "EditorWindow"
+				exit 1
+				break
+			case "GetTextButton"
+				print textedit get$ "EditorText"
+				exit 0
+				break
+			case "GetTextEditButton"
+				print textcontrol get$ "EditorText"
+				exit 0
+				break
+			case "CalendarWindow:_QuitRequested"
+				window close "CalendarWindow"
+				exit 1
+				break
+			case "CalendarButton"
+				print calendar get$ "CalendarWidget"
+				exit 0
+				break
+			case "RadioWindow:_QuitRequested"
+				window close "RadioWindow"
+				exit 1
+				break
+			case "RadioOKButton"
+				print radio
+				exit 0
+				break
+			case "GraphicWindow:_QuitRequested"
+			case "GraphicMainButton"
+			case "GraphicLittleButton"
+				window close "GraphicWindow"
+				exit 0
+				break
+			case "ProgressBarWindow:_QuitRequested"
+				window close "ProgressBarWindow"
+				exit 1
+				break
+			default
+				break
+		end switch
+	if left$(msg$(everyCommand),5) = "Radio" then
+		radio = val(right$(msg$(everyCommand),1))
+	endif
+	next everyCommand
+	if ProgressBarExist = 1 then
+		wait .2
+		ProgressButtons()
+	endif 
+wend
+
+sub CalendarBox()
+	local XOrigin, YOrigin, XWidth, YHeight, CalendarButtonText$
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 150
+	YHeight = 30
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	CalendarButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" then
+		CalendarButtonText$ = "✔" 
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "CalendarWindow", ""
+	shortcut "CalendarWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"CalendarWindow"
+	Window set "CalendarWindow", "look", "floating"
+	Window set "CalendarWindow", "flags", "not-resizable"
+	Window set "CalendarWindow", "flags", "not-zoomable"
+	Window set "CalendarWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "CalendarWindow", "Workspace", "all"
+	calendar 5,5, "CalendarWidget", a$(4), "", "CalendarWindow"
+	button XWidth - 35,5 to XWidth - 5, YHeight -5, "CalendarButton", CalendarButtonText$, "CalendarWindow"
+	RenameWindow("CalendarWindow", 5)
+end sub
+
+sub CloseWindow()
+	//Close down the main window
+	window close "MainWindow"
+end sub
+
+sub Editor$()
+	local XOrigin, YOrigin, XWidth, YHeight, GetTextButtonText$,ButtonOffset, a$
+	if val(right$(a$(2),1))>2 then
+		a$(2) = "-q0"
+	end if
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = PEEK("DesktopHeight")/2
+	XWidth = 300
+	YHeight = 350
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY/2
+	ButtonOffset = 30
+	GetTextButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
+	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", ""
+	draw set "BGColor", red,green,blue,"EditorWindow"
+	Window set "EditorWindow", "flags", "not-zoomable, not-resizable, accept-first-click"
+	textedit 1,1 to XWidth,YHeight - ButtonOffset, "EditorText", 1, "EditorWindow"
+	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "GetTextButton", GetTextButtonText$, "EditorWindow"
+	if lower$(a$(4)) <> "" then
+		if lower$(a$(4)) = "-t" then
+			textedit add "EditorText", a$(5)
+		elseif lower$(a$(4)) = "-f" then
+			print a$(5)
+			open a$(5) for reading as #1
+			while (not EOF(1))
+				line input #1 a$
+				textedit add "EditorText", a$
+				textedit add "EditorText", chr$(10)
+			wend
+			close #1 
+		end if
+	end if
+	RenameWindow("EditorWindow", 6)
+end sub
+
+sub GetClip(printthis)
+	local clipcontent$
+	clipcontent$ = clipboard paste$
+	wait 0.1 //perhaps this will help secure the variable - it does, sometimes
+			//I'm getting weird errors here
+	if printthis = 1 then 
+		print clipcontent$
+	elseif printthis = 0 then
+		a$(4) = clipcontent$
+	endif
+end sub
+
+sub GetQuadrant()
+	local Quadrant
+	 if left$(lower$(a$(2)),2) <> "-q" or  len(a$(2)) <> 3 then
+	 	print "Quadrant not specified. Defaulting to Centred (-q0)."  
+		return 0
+	elseif lower$(right$(a$(2),1)) = "r" then
+		Quadrant = int(ran()*5) 
+		Return Quadrant
+	elseif lower$(right$(a$(2),1)) = "s" then
+		AllDesktops = 1
+		Quadrant = int(ran(5)) 
+		Return Quadrant
+	elseif val(right$(a$(2),1))>4 then
+		AllDesktops = 1
+		Quadrant = val(right$(a$(2),1)) -5
+		Return Quadrant
+	elseif  val(right$(a$(2),1)) < 0 or  val(right$(a$(2),1)) > 4 
+		print "Quadrant specified out of bounds. Defaulting to Centred (-q0)."
+		return 0
+	else
+		Quadrant = val(right$(a$(2),1))
+		Return Quadrant
+	endif
+end sub
+
+sub GetScreenCoords(xory$)
+	local Quadrant, Result
+	Quadrant = GetQuadrant()
+	//refresh screensize in case user changed desktops
+	if xory$ = "x" then
+		ScreenW = PEEK("DesktopWidth") 
+		switch Quadrant
+		case 0
+			Result = int(ScreenW/2)
+			break
+		case 1
+		case 4
+			Result = int(ScreenW/4)
+			break
+		case 2
+		case 3
+			Result = int(ScreenW * 0.75)
+			break
+		end switch
+		//Not too close to the edges ...
+		//Also, create a default if something funny happened 
+		if Result <150 Result=150
+		if Result > ScreenW - 150 Result =  ScreenW - 150
+	elseif xory$ = "y" then
+		ScreenH = PEEK("DesktopHeight")
+		switch Quadrant
+		case 0
+			Result = int(ScreenH/2)
+			break
+		case 1
+		case 2
+			Result = int(ScreenH/4)
+			break
+		case 3
+		case 4
+			Result = int(ScreenH * 0.75)
+			break
+		end switch
+		//Not too close to the edges ...
+		if Result <60 Result=60
+		if Result > ScreenH - 60 Result =  ScreenH - 60
+	endif
+	return Result
+end sub
+
+sub GraphicBox()
+	local XOrigin, YOrigin, XWidth, YHeight, GraphicButtonText$, GraphicFile$
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 300
+	YHeight = 330
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	GraphicButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" GraphicButtonText$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" GraphicButtonText$ = mid$(a$(3),4)
+	if a$(4) = "" then
+		GraphicFile$ = "/boot/home/config/settings/yabdialog.png"
+	else
+		GraphicFile$ = a$(4)
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "GraphicWindow", ""
+	draw set "BGColor", red,green,blue,"GraphicWindow"
+	Window set "GraphicWindow", "look", "modal"
+	Window set "GraphicWindow", "flags", "not-resizable"
+	Window set "GraphicWindow", "flags", "accept-first-click"
+	shortcut "GraphicWindow","AQ", "_QuitRequested" 
+	if AllDesktops = 1 window set "GraphicWindow", "Workspace", "all"
+	button image 1,1, "GraphicMainButton",GraphicFile$, GraphicFile$, "", "GraphicWindow"
+	button XWidth/4, YHeight - 26 to XWidth * 0.75, YHeight - 2, "GraphicLittleButton", GraphicButtonText$, "GraphicWindow"
+end sub
+
+sub MakeMenu()
+	//Create menu in MainWindow
+	menu "File", "Quit", "Q", "MainWindow"
+	menu "Help", "About", "", "MainWindow"
+end sub
+
+sub OKCancelAlert()
+	local XOrigin, YOrigin, XWidth, YHeight, lines,OKButtonText$, CancelButtonText$, BothButtons$, numbuttons
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 275
+	YHeight = 45
+//	print len(a$(4))
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	OKButtonText$ = "OK"
+	CancelButtonText$ = "Cancel"
+	if lower$(a$(3)) = "-b0" then
+		OKButtonText$ = "✔" 
+		CancelButtonText$ = "✘"
+	endif
+	if left$(lower$(a$(3)),3) = "-b2" then
+		BothButtons$ = mid$(a$(3),4)
+		dim z$(1)
+		numbuttons = token(BothButtons$,z$(),"=")
+		OKButtonText$ = z$(1)
+		CancelButtonText$ = z$(2)
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "OKCancelAlertWindow", ""
+	shortcut "OKCancelAlertWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"OKCancelAlertWindow"
+	Window set "OKCancelAlertWindow", "look", "modal"
+	Window set "OKCancelAlertWindow", "flags", "not-resizable"
+	Window set "OKCancelAlertWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "OKCancelAlertWindow", "Workspace", "all"
+	button XWidth - (YHeight + 30), 1 to XWidth-1,YHeight/2 -1, "OKButton",OKButtonText$, "OKCancelAlertWindow" 
+	button XWidth - (YHeight + 30), YHeight/2  to XWidth-1,YHeight-1, "CancelButton", CancelButtonText$, "OKCancelAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 31),YHeight -1, "OKCancelAlertText", 0, "OKCancelAlertWindow"
+	textedit set "OKCancelAlertText", "wordwrap", 1
+	textedit set "OKCancelAlertText", "editable", 0
+	textedit add "OKCancelAlertText", a$(4)
+	textedit color "OKCancelAlertText", "bgcolor", red, green, blue
+end sub
+
+sub OpenWindow()
+	//Setup the main window here
+	window open 100,100 to 600,500, "MainWindow", "Main Window"
+	MakeMenu()
+end sub
+
+sub ProgressBar()
+	local XOrigin, YOrigin, XWidth, YHeight,OKButton$, progress, progress$
+	ProgressBarExist = 1
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 270
+	YHeight = 30
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	CancelButton$ = "Cancel"
+	if lower$(a$(3)) = "-b0" CancelButton$ = "✘" 
+	if left$(lower$(a$(3)),3) = "-b2" CancelButton$ = mid$(a$(3),4)
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "ProgressBarWindow", a$(4)
+	draw set "BGColor", red,green,blue,"ProgressBarWindow"
+	Window set "ProgressBarWindow", "look", "floating"
+	Window set "ProgressBarWindow", "flags", "not-resizable"
+	Window set "ProgressBarWindow", "flags", "not-zoomable"
+	Window set "ProgressBarWindow", "flags", "accept-first-click"
+	shortcut "ProgressBarWindow","AQ", "_QuitRequested" 
+	if AllDesktops = 1 window set "ProgressBarWindow", "Workspace", "all"
+	button XWidth - 70, 2 to XWidth-2,YHeight-2, "CancelButton",CancelButton$, "ProgressBarWindow" 
+	ProgressButtons()
+end sub
+
+sub ProgressButtons()
+	static total
+	open a$(5) for reading as #1
+		line input #1 progress$
+		progress = int(val(progress$))
+	close #1
+	if progress = total return
+	if progress > 9 or progress < 0 then 
+		window close "ProgressBarWindow"
+		exit 1
+	endif
+	button 10 + ((progress -1 ) * 20) , 3 to 30 + ((progress -1) * 20),27,  "progressbutton" + progress$, progress$, "ProgressBarWindow"
+	total = progress
+end sub
+
+sub PutClip()
+	clipboard copy a$(2)
+end sub
+
+sub RadioBox()
+	local XOrigin, YOrigin, XWidth, YHeight, radios, radioypos, ButtonOffset
+	radios = val(a$(4))
+	radioypos = 5
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 300
+	YHeight = 35 + (radios * 20)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	ButtonOffset = 25
+		RadioOKButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "✔" 
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "RadioWindow",""
+	//shortcut "RadioWindow","AQ", "_QuitRequested"
+	draw set "BGColor", red,green,blue,"RadioWindow"
+	Window set "RadioWindow", "look", "floating"
+	Window set "RadioWindow", "flags", "not-resizable"
+	Window set "RadioWindow", "flags", "not-zoomable"
+	Window set "RadioWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "RadioWindow", "Workspace", "all"
+	RenameWindow("RadioWindow",radios + 5)
+	for f = 5 to radios +4
+		radiobutton 5, radioypos, "Radio" + str$(f-4), a$(f),0, "RadioWindow"  
+		radioypos = radioypos + 20
+	next f
+	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "RadioOKButton", RadioOKButtonText$, "RadioWindow"
+end sub
+
+sub RenameWindow(WindowID$,arraypos)
+	If a$(arraypos) = "" then
+		return
+	else
+		window set WindowID$, "Title",	a$(arraypos)
+	endif
+end sub
+
+sub SetColors()
+	local parameter$
+	parameter$ = lower$(a$(2))
+	if parameter$ = "custom" then
+		red = val(a$(3))
+		green = val(a$(4))
+		blue = val(a$(5))
+	elseif parameter$ = "white"
+		red = 255
+		green = 255
+		blue = 255
+	elseif parameter$ = "yellow"
+		red = 250
+		green = 250
+		blue = 130
+	elseif parameter$ = "blue"
+		red = 120
+		green = 190
+		blue = 220
+	elseif parameter$ = "red"
+		red = 220
+		green = 100
+		blue = 100
+	elseif parameter$ = "green"
+		red = 100
+		green = 220
+		blue = 120
+	elseif parameter$ = "purple" //undocumented easter egg!!!
+		red = 210
+		green = 100
+		blue = 220
+	else // the "boring" color - actually also the error default
+		red = 216
+		green = 216
+		blue = 216
+	endif
+	open ConfigFile$ for writing as #1
+		print #1 red
+		print #1 green
+		print #1 blue
+	close #1
+	print "yabdialog colors changed to " + str$(red) + " " + str$(green) + " " + str$(blue)
+	exit 0
+end sub
+
+sub ShowAbout()
+	Alert ProgramName$ + " " + ProgramVersion$ + "\n" + "by " + AuthorName$ +"\n\n" + ProgramBriefDescription$ +"\n\nRunning in yab " + str$(peek("version")) + " under " + peek$("os") + "." + "\n\n" + ProgramLicense$ , "OK", "none"
+	rem + ProgramAcknowledgements$, "OK", "none"
+	exit 0
+end sub
+
+sub ShowHelp()
+	print ProgramName$ + " " + ProgramVersion$
+	print "by " + AuthorName$ 
+	Print 
+	print "yabdialog is a CLI utility that displays a variety of dialogs, alerts and panels"
+	print "with more control over color and placement than you get with the standard"
+	print "Haiku alert and filepanel commands. It also contains additional widgets."
+	print
+	print "The yabdialog command should be  callable from any scripting language that "
+	print "can issue a SYSTEM call and receive string data back from standard input."
+	print
+	print "All parameters must be supplied, in the correct order. Some error-checking"
+	print "is performed, but things will get unpredictable if you swop parameters. On"
+	print "the bright side, all parameters are case-insensitive."
+	print
+	print "Usage: yabdialog <widget> <common-options> <specific-options>"
+	print "yabdialog --colorcontrol white|yellow|red|blue|green|purple|boring"
+	print "yabdialog --colorcontrol custom <red> <green> <blue>"
+	print
+	print "WIDGETS"
+	print "   -s\t--SimpleAlert: A simple fixed-size Alert box with a"
+	print "\t\tsingle OK Button. Good for 140 characters, after"
+	print "\t\twhich the message will be truncated."
+	print "\t\tReturns: Nothing"
+	
+	print "   -y\t--YesNoAlert: A simple fixed-size Alert box with 2"
+	print "\t\tbuttons for Yes and No. Good for 140 characters,"
+	print "\t\tafter which the message will be truncated."
+	print "\t\tReturns: \"yes\" or \"no\""
+	
+	print "   -o\t--OKCancelAlert: Like YesNoAlert, but with buttons "
+	print" \t\tthat read OK and Cancel"
+	print "\t\tReturns: \"ok\" or \"cancel\""
+	
+	print "   -e\t--Editor: A multiline text editing box. Cut and paste"
+	print "\t\tis available via a right-click"
+	print "\t\tReturns: Contents of the edited text"
+
+	print "   -t\t--TextInput: A single-line text editing box. Cut and paste"
+	print "\t\tis available via a right-click"
+	print "\t\tReturns: Contents of the edited text"
+	
+	print "   -c\t--Calendar: Displays a calendar widget."
+	print "\t\tReturns: The selected date in the specified format."
+	
+	print "   -r\t--RadioBox: Create a window with up to 5 radiobuttons"
+	print "\t\tReturns: the number of the selected button. If nothing was"
+	print "\t\tselected, 0 is returned."
+	
+	print "   -g\t--GraphicBox: Displays a window with a 300x300 graphic."
+	print "\t\tReturns: Nothing"
+	
+	print "   -p\t--ProgressBar: Displays the progress of an action in 10% increments."
+	print "\t\tReturns: \"cancel\" if cancelled by user, otherwise nothing"
+	
+	print "   -x\t--CopyToClipboard: copy supplied text to system clipboard."
+	print"\t\tBuilt-in alias: --Copy2Clipboard"
+	print "\t\tReturns: Nothing"
+	
+	print "   -v\t--GetClipboard: Retrieve text clipboard contents."
+	print "\t\tReturns: Clipboard content if that consists of text, otherwise"
+	print "\t\treturns an empty string"
+	
+	print "   -z\t--ViewClipboard:Display current text clipboard contents in a"
+	print "\t\tSimpleAlert window."
+	print "\t\tReturns: Nothing"
+	
+	print "   \t--ColorControl: Sets the color in which widgets will be displayed."
+	print "\t\tReturns: Nothing"
+	
+	print "   \t--MakeContact: Send me an email about yabdialog."
+			
+	print "   -h\t--help: This HELP information."
+	
+	print "\t--about: Display an ABOUT dialog."
+	print
+	print "   -h > yabdialog.txt\tsave this help data to a text file."
+	PRINT
+	print "COMMON OPTIONS"
+	print
+	Print "These options are compulsory and must precede specific options."
+	print "Options cannot be concatenated or omitted and must be entered in order."
+	print
+	print "-q[0-9|r|s]\tSet the quadrant in which to display a widget."
+	print "\t\t-q0 - centered"
+	print "\t\t-q1 - top left"
+	print "\t\t-q2 - top right"
+	print "\t\t-q3 - bottom right"
+	print "\t\t-q4 - bottom left"
+	print "\t\t-q5 - centered on all desktops"
+	print "\t\t-q6 - top left on all desktops"
+	print "\t\t-q7 - top right on all desktops"
+	print "\t\t-q8 - bottom right on all desktops"
+	print "\t\t-q9 - bottom left on all desktops"
+	print "\t\t-qr - random position on current desktop"
+	print "\t\t-qs - random position on all desktops"
+	print "the r and s parameters are experimental and not recommended."
+	print
+	print "   -b[0|1|2]\"|Message text\""
+	print "\t\t-b0 Graphical button with checkmark"
+	print "\t\t-b1Text button with \"OK\""
+	print "\t\t-b2USERTEXT Text button with user-supplied text [1]"
+	print
+	
+	print "SPECIFIC OPTIONS"
+	print
+	print "Specific options must be entered after the common options. Options"
+	print "can not be concatenated or omitted and must be entered in order."
+	print
+	print "SIMPLEALERT"
+	print "yabdialog -o <common-options> <text>"
+		print "Example: yabdialog -s -q1 -b1 \"Click OK to make this message go away\""
+	print "Example: yabdialog -s -q1 -b2Ja \"Spreekt u Nederlands?\""
+	print "Example: yabdialog -s -q1 -b2☻ \"Smile! It's a beautiful day.\""
+	print
+	print "YESNOALERT"
+	print "yabdialog -y <common-options> <text>"
+	print "Example: yabdialog -y -q1 -b0 \"Will we watch football tonight?\""
+	print "Example: yabdialog -y -q1 -b1 \"Will we watch football tonight?\""
+	print "Example: yabdialog -y -q1 -b2Ja=Nee \"Spreekt u Nederlands?\""
+	print "Example: yabdialog -y -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\""
+	print "Example: yabdialog -y -q1 -b2Oui=Non \"Parlez-vous français?\""
+	print "Example: yabdialog -y -q1 -b2Si=No \"¿Habla usted español?\"[2]"
+	print
+	print "OKCANCELALERT"
+	print "yabdialog -o <common-options> <text> [3]"
+	print "Example: yabdialog -o -q1 -b0 \"Delete the whole partition?\""
+	print "Example: yabdialog -o -q1 -b1 \"Flash the BIOS?\""
+	print "Example: yabdialog -o -q1 -b2Sure=Never! \"Declare war on Linux?\""
+	print
+	print "EDITOR"
+	print "yabdialog -e <common-options> <content type> <content/file>"
+	print "Common Options: only quadrants 0-2 are available. Giving any"
+	print "higher value will cause a default to 0"
+	print "   -t <Initial Text>  OR"
+	print "   -f <Initial Filename>"
+	print "ONE of -t or -f MUST be supplied, but either the string or the file"
+	print "may be empty."  
+	print "Example: yabdialog -e -q0 -b2Insert this -t \"This is some example text\""
+	print "Example: yabdialog -e -q1 -b0 -t \"\""
+	print "Example: yabdialog -e -q2 -b1 -f \"/boot/home/.bash_history\""
+	print "This widget takes an OPTIONAL additional parameter, which becomes the"
+	print "window title printed in the tab."
+	print "Example: yabdialog -e -q1 -b1 -t \"example text\" \"The Editor\""
+	print
+	print "TEXT INPUT"
+	print "yabdialog -t <common-options> \"Tab title\""
+	print "Example: yabdialog -t -q1 -b1 \"What is your name?\""
+	print
+	Print "CALENDAR"
+	print "yabdialog -c <common-options> <date-format>"
+	print "Date format consists of either MMDDYYY or DDMMYYY, with an optional"
+	print "divider which can be one of \".\", \"/\" or \"-\". If no divider is supplied,"
+	print "\".\" will be used. The return value will be supplied in the same format." 
+	print "Example: yabdialog -c -q6 -b3 DDMMYYY-" 
+	print "This widget takes an OPTIONAL additional parameter, which becomes the"
+	print "window title printed in the tab."
+	print "Example: yabdialog -c -q0 -b0 MMDDYYY- \"Pick a date\""
+	print
+	print "RADIOBOX"
+	print"yabdialog -r <common-options> <number> <Radiobuttontext1> ..."
+	print "Number is the number of radiobuttons (1-5) you wish to create."
+	print "Radiobuttontext1 to Radiobuttontext5 contains the text to go next to"
+	print "the radiobuttons."
+	print "Example:  yabdialog -r -q6 -b1 5 Haiku GNU/Linux \"Windows 8\" FreeBSD \"I don't"
+	print "    like operating systems\" \"What is your favourite Operating System?\""
+	print
+	print"GRAPHICBOX"
+	print "yabdialog -g <common-options> <filename>"
+	print "<filename> refers to a 300x300 .PNG file. If no filename is supplied,"
+	print "yabdialog will look for the file ~/config/settings/yabdialog.png."
+	print "This is meant for splash screens. Clicking either the graphic or the"
+	print "button will dismiss the window.[5]"
+	print "Example: yabdialog -g -q3 -b0 \"/boot/home/Desktop/clip.png\""
+	print 
+	print "PROGRESSBAR"
+	print "yabdialog -p <common-options>  <windowtab text> <filename>"
+	print "<windowtab text> is the text in the window's tab."
+	print "<filename> is a file containing a number between 0 and 9, and "
+	print "nothing else, not even a newline. The program will exit when the"
+	print "value in <filename> exceeds 9"
+	print "Example: Run the following bash script"
+	print "\t#!/bin/bash"
+	print "\techo 0 > ~/Desktop/temp.txt"
+	print "\tyabdialog -p -q1 -b1 \"Counting to 10 ...\" ~/Desktop/temp.txt &"
+	print "\tfor f in `seq 1 10`;"
+	print "\tdo"
+	print "\t   echo $f > ~/Desktop/temp.txt"
+	print "\t   sleep 2"
+	print "\tdone"
+	print
+	print "COPYTOCLIPBOARD"
+	print "yabdialog -x <text to copy to clipboard>"
+	print "Example: yabdialog -x \"put this text on the clipboard, please.\""
+	print
+	print "GETCLIPBOARD"
+	print "No additional parameters required."
+	print "Example: yabdialog -v"
+	print
+	print "VIEWCLIPBOARD"
+	print "yabdialog -z <common-options>"
+	print "Example: yabdialog -z -q2 -b0"
+	print
+	print "COLORCONTROL"
+	print "yabdialog --ColorControl <color>"
+	print "where <color> is one of white, yellow, blue, red, green or boring[6]"
+	print "\tOR"
+	print "yabdialog --ColorControl custom <red> <green> <blue>"
+	print "Example: yabdialog --ColorControl white"
+	print "Example: yabdialog --ColorControl custom 240 150 200"
+	print "All NEW widgets will be created in the new color.[7]"
+	print 
+	print "MAKECONTACT"
+	print "No additional parameters required."
+	print "Example: yabdialog --MakeContact"
+	print
+	print "NOTES"
+	print "1. The -b2 parameter is not available in the following widgets:"
+	print "    Calendar, Radiobox."
+	print "2. yabdialog -y will return \"yes\" or \"no\" regardless of the button label!"
+	print "3. The following two commands:"
+	print "   yabdialog -y -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\"  and"
+	print "   yabdialog -o -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\""
+	print "    will produce identical dialogs, but present different values back"
+	print "    to the operating system or calling routine in your script language." 
+	print "4. You can put labels of more than one word on widgets. The trick"
+	print "    is to use CHR 160 rather than the normal <space> which is CHR 32."
+	print "5. Alt-Q will exit any yabdialog window and the program as a whole,"
+	print "    even in tabless windows. Dealing with the lack of a return value"
+	print "    will be your problem."
+	print "6. The color \"boring\" is the standard medium grey Haiku dialog tint,"
+	print "   i.e. r=216 g=216 b=216. It is also the starting default."
+	print "7. Color changes will persist across reboots! Remember to switch the"
+	print "   yabdialog color back to \"boring\" (see above) or to delete the file"
+	print "   /boot/home/config/settings/yabdialog.cfg when you are done." 
+	print
+	exit 0
+end sub
+
+sub SimpleAlert()
+	local XOrigin, YOrigin, XWidth, YHeight,OKButton$
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 250
+	YHeight = 30
+	if len(a$(4))>70 YHeight = 45: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	OKButton$ = "OK"
+	if lower$(a$(3)) = "-b0" OKButton$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" OKButton$ = mid$(a$(3),4)
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "SimpleAlertWindow", ""
+	draw set "BGColor", red,green,blue,"SimpleAlertWindow"
+	Window set "SimpleAlertWindow", "look", "modal"
+	Window set "SimpleAlertWindow", "flags", "not-resizable"
+	Window set "SimpleAlertWindow", "flags", "accept-first-click"
+	shortcut "SimpleAlertWindow","AQ", "_QuitRequested" 
+	if AllDesktops = 1 window set "SimpleAlertWindow", "Workspace", "all"
+	button XWidth - YHeight, 2 to XWidth-2,YHeight-2, "SimpleAlertButton",OKButton$, "SimpleAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 1),YHeight -1, "SimpleAlertText", 0, "SimpleAlertWindow"
+	textedit set "SimpleAlertText", "wordwrap", 1
+	textedit set "SimpleAlertText", "editable", 0
+	textedit add "SimpleAlertText", a$(4)
+	textedit color "SimpleAlertText", "bgcolor", red, green, blue
+end sub
+
+sub TextInput$()
+	local XOrigin, YOrigin, XWidth, YHeight, GetTextButtonText$,ButtonOffset, a$
+	if val(right$(a$(2),1))>2 then
+		a$(2) = "-q0"
+	end if
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = PEEK("DesktopHeight")/2
+	XWidth = 300
+	YHeight = 55
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY/2
+	ButtonOffset = 30
+	GetTextButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
+	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", a$(4)
+	draw set "BGColor", red,green,blue,"EditorWindow"
+	Window set "EditorWindow", "flags", "not-zoomable, not-resizable, accept-first-click"
+	textcontrol 1,1 to XWidth,YHeight - ButtonOffset, "EditorText", "", "","EditorWindow"
+	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "GetTextEditButton", GetTextButtonText$, "EditorWindow"
+		RenameWindow("EditorWindow", 6)
+end sub
+
+sub WhatWidget()
+	local Choice$,Result$
+	Choice$ = lower$(a$(1))
+	switch Choice$
+		case "-t"
+		case "--textinput"
+			TextInput$()
+			break
+		case "-s"
+		case "--simplealert"
+			SimpleAlert()
+			break
+		case "-y"
+		case "--yesnoalert"
+			YesNoAlert()
+			break
+		case "-o"
+		case "--okcancelalert"
+			OKCancelAlert()
+			break
+		case "-e"
+		case "--editor"
+			Editor$()
+			break
+		case "-c"
+		case "--calendar"
+			CalendarBox()
+			break
+		case "-r"
+		case "--radiobox"
+			RadioBox()
+			break
+		case "-g"
+		case "--graphic"
+			GraphicBox()
+			break
+		case "-v"
+		case "--getclipboard"
+			GetClip(1)
+			exit 0
+			break
+		case "-z"
+		case "--viewclipboard"
+			GetClip(0)
+			SimpleAlert()
+			break
+		case "-x"
+		case "--copytoclipboard"
+		case "--copy2clipboard"
+			PutClip()
+			exit 0
+			break
+		case "-p"
+		case "--progressbar"
+			ProgressBar()
+			break
+		case "--colorcontrol"
+			SetColors()
+			break
+		case "--makecontact"
+			system("/boot/system/apps/Mail mailto:clasqm@gmail.com -subject \"yabdialog suggestion or query\"")
+			exit 0
+			break
+		case "--about"
+			ShowAbout()
+			break
+		default
+			print "Widget not recognised."
+			exit 1
+			break
+	end switch
+end sub
+
+sub YesNoAlert()
+	local XOrigin, YOrigin, XWidth, YHeight, lines,YesButtonText$, NoButtonText$, BothButtons$, numbuttons
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 275
+	YHeight = 45
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	YesButtonText$ = "Yes"
+	NoButtonText$ = "No"
+	if lower$(a$(3)) = "-b0" then
+		YesButtonText$ = "✔" 
+		NoButtonText$ = "✘"
+	endif
+	if left$(lower$(a$(3)),3) = "-b2" then
+		BothButtons$ = mid$(a$(3),4)
+		dim z$(1)
+		numbuttons = token(BothButtons$,z$(),"=")
+		YesButtonText$ = z$(1)
+		NoButtonText$ = z$(2)
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "YesNoAlertWindow", ""
+	shortcut "YesNoAlertWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"YesNoAlertWindow"
+	Window set "YesNoAlertWindow", "look", "modal"
+	Window set "YesNoAlertWindow", "flags", "not-resizable"
+	Window set "YesNoAlertWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "YesNoAlertWindow", "Workspace", "all"
+	button XWidth - (YHeight + 30), 1 to XWidth-1,YHeight/2 -1, "YesButton",YesButtonText$, "YesNoAlertWindow" 
+	button XWidth - (YHeight + 30), YHeight/2  to XWidth-1,YHeight-1, "NoButton", NoButtonText$, "YesNoAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 31),YHeight -1, "YesNoAlertText", 0, "YesNoAlertWindow"
+	textedit set "YesNoAlertText", "wordwrap", 1
+	textedit set "YesNoAlertText", "editable", 0
+	textedit add "YesNoAlertText", a$(4)
+	textedit color "YesNoAlertText", "bgcolor", red, green, blue
+end sub
+
+########################################
+###DATA statements come here###
+########################################
+

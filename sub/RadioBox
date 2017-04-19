@@ -1,0 +1,29 @@
+sub RadioBox()
+	local XOrigin, YOrigin, XWidth, YHeight, radios, radioypos, ButtonOffset
+	radios = val(a$(4))
+	radioypos = 5
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 300
+	YHeight = 35 + (radios * 20)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	ButtonOffset = 25
+		RadioOKButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "✔" 
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "RadioWindow",""
+	//shortcut "RadioWindow","AQ", "_QuitRequested"
+	draw set "BGColor", red,green,blue,"RadioWindow"
+	Window set "RadioWindow", "look", "floating"
+	Window set "RadioWindow", "flags", "not-resizable"
+	Window set "RadioWindow", "flags", "not-zoomable"
+	Window set "RadioWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "RadioWindow", "Workspace", "all"
+	RenameWindow("RadioWindow",radios + 5)
+	for f = 5 to radios +4
+		radiobutton 5, radioypos, "Radio" + str$(f-4), a$(f),0, "RadioWindow"  
+		radioypos = radioypos + 20
+	next f
+	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "RadioOKButton", RadioOKButtonText$, "RadioWindow"
+end sub
+

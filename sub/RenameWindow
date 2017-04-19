@@ -1,0 +1,8 @@
+sub RenameWindow(WindowID$,arraypos)
+	If a$(arraypos) = "" then
+		return
+	else
+		window set WindowID$, "Title",	a$(arraypos)
+	endif
+end sub
+

@@ -1,0 +1,45 @@
+sub SetColors()
+	local parameter$
+	parameter$ = lower$(a$(2))
+	if parameter$ = "custom" then
+		red = val(a$(3))
+		green = val(a$(4))
+		blue = val(a$(5))
+	elseif parameter$ = "white"
+		red = 255
+		green = 255
+		blue = 255
+	elseif parameter$ = "yellow"
+		red = 250
+		green = 250
+		blue = 130
+	elseif parameter$ = "blue"
+		red = 120
+		green = 190
+		blue = 220
+	elseif parameter$ = "red"
+		red = 220
+		green = 100
+		blue = 100
+	elseif parameter$ = "green"
+		red = 100
+		green = 220
+		blue = 120
+	elseif parameter$ = "purple" //undocumented easter egg!!!
+		red = 210
+		green = 100
+		blue = 220
+	else // the "boring" color - actually also the error default
+		red = 216
+		green = 216
+		blue = 216
+	endif
+	open ConfigFile$ for writing as #1
+		print #1 red
+		print #1 green
+		print #1 blue
+	close #1
+	print "yabdialog colors changed to " + str$(red) + " " + str$(green) + " " + str$(blue)
+	exit 0
+end sub
+

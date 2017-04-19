@@ -1,0 +1,4 @@
+sub PutClip()
+	clipboard copy a$(2)
+end sub
+

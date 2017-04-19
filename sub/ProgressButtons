@@ -1,0 +1,15 @@
+sub ProgressButtons()
+	static total
+	open a$(5) for reading as #1
+		line input #1 progress$
+		progress = int(val(progress$))
+	close #1
+	if progress = total return
+	if progress > 9 or progress < 0 then 
+		window close "ProgressBarWindow"
+		exit 1
+	endif
+	button 10 + ((progress -1 ) * 20) , 3 to 30 + ((progress -1) * 20),27,  "progressbutton" + progress$, progress$, "ProgressBarWindow"
+	total = progress
+end sub
+

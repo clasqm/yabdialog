@@ -1,0 +1,45 @@
+sub GetScreenCoords(xory$)
+	local Quadrant, Result
+	Quadrant = GetQuadrant()
+	//refresh screensize in case user changed desktops
+	if xory$ = "x" then
+		ScreenW = PEEK("DesktopWidth") 
+		switch Quadrant
+		case 0
+			Result = int(ScreenW/2)
+			break
+		case 1
+		case 4
+			Result = int(ScreenW/4)
+			break
+		case 2
+		case 3
+			Result = int(ScreenW * 0.75)
+			break
+		end switch
+		//Not too close to the edges ...
+		//Also, create a default if something funny happened 
+		if Result <150 Result=150
+		if Result > ScreenW - 150 Result =  ScreenW - 150
+	elseif xory$ = "y" then
+		ScreenH = PEEK("DesktopHeight")
+		switch Quadrant
+		case 0
+			Result = int(ScreenH/2)
+			break
+		case 1
+		case 2
+			Result = int(ScreenH/4)
+			break
+		case 3
+		case 4
+			Result = int(ScreenH * 0.75)
+			break
+		end switch
+		//Not too close to the edges ...
+		if Result <60 Result=60
+		if Result > ScreenH - 60 Result =  ScreenH - 60
+	endif
+	return Result
+end sub
+

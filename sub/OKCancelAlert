@@ -1,0 +1,40 @@
+sub OKCancelAlert()
+	local XOrigin, YOrigin, XWidth, YHeight, lines,OKButtonText$, CancelButtonText$, BothButtons$, numbuttons
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 275
+	YHeight = 45
+//	print len(a$(4))
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	OKButtonText$ = "OK"
+	CancelButtonText$ = "Cancel"
+	if lower$(a$(3)) = "-b0" then
+		OKButtonText$ = "✔" 
+		CancelButtonText$ = "✘"
+	endif
+	if left$(lower$(a$(3)),3) = "-b2" then
+		BothButtons$ = mid$(a$(3),4)
+		dim z$(1)
+		numbuttons = token(BothButtons$,z$(),"=")
+		OKButtonText$ = z$(1)
+		CancelButtonText$ = z$(2)
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "OKCancelAlertWindow", ""
+	shortcut "OKCancelAlertWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"OKCancelAlertWindow"
+	Window set "OKCancelAlertWindow", "look", "modal"
+	Window set "OKCancelAlertWindow", "flags", "not-resizable"
+	Window set "OKCancelAlertWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "OKCancelAlertWindow", "Workspace", "all"
+	button XWidth - (YHeight + 30), 1 to XWidth-1,YHeight/2 -1, "OKButton",OKButtonText$, "OKCancelAlertWindow" 
+	button XWidth - (YHeight + 30), YHeight/2  to XWidth-1,YHeight-1, "CancelButton", CancelButtonText$, "OKCancelAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 31),YHeight -1, "OKCancelAlertText", 0, "OKCancelAlertWindow"
+	textedit set "OKCancelAlertText", "wordwrap", 1
+	textedit set "OKCancelAlertText", "editable", 0
+	textedit add "OKCancelAlertText", a$(4)
+	textedit color "OKCancelAlertText", "bgcolor", red, green, blue
+end sub
+

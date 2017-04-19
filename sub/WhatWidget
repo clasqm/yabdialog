@@ -1,0 +1,73 @@
+sub WhatWidget()
+	local Choice$,Result$
+	Choice$ = lower$(a$(1))
+	switch Choice$
+		case "-t"
+		case "--textinput"
+			TextInput$()
+			break
+		case "-s"
+		case "--simplealert"
+			SimpleAlert()
+			break
+		case "-y"
+		case "--yesnoalert"
+			YesNoAlert()
+			break
+		case "-o"
+		case "--okcancelalert"
+			OKCancelAlert()
+			break
+		case "-e"
+		case "--editor"
+			Editor$()
+			break
+		case "-c"
+		case "--calendar"
+			CalendarBox()
+			break
+		case "-r"
+		case "--radiobox"
+			RadioBox()
+			break
+		case "-g"
+		case "--graphic"
+			GraphicBox()
+			break
+		case "-v"
+		case "--getclipboard"
+			GetClip(1)
+			exit 0
+			break
+		case "-z"
+		case "--viewclipboard"
+			GetClip(0)
+			SimpleAlert()
+			break
+		case "-x"
+		case "--copytoclipboard"
+		case "--copy2clipboard"
+			PutClip()
+			exit 0
+			break
+		case "-p"
+		case "--progressbar"
+			ProgressBar()
+			break
+		case "--colorcontrol"
+			SetColors()
+			break
+		case "--makecontact"
+			system("/boot/system/apps/Mail mailto:clasqm@gmail.com -subject \"yabdialog suggestion or query\"")
+			exit 0
+			break
+		case "--about"
+			ShowAbout()
+			break
+		default
+			print "Widget not recognised."
+			exit 1
+			break
+	end switch
+end sub
+

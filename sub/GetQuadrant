@@ -1,0 +1,25 @@
+sub GetQuadrant()
+	local Quadrant
+	 if left$(lower$(a$(2)),2) <> "-q" or  len(a$(2)) <> 3 then
+	 	print "Quadrant not specified. Defaulting to Centred (-q0)."  
+		return 0
+	elseif lower$(right$(a$(2),1)) = "r" then
+		Quadrant = int(ran()*5) 
+		Return Quadrant
+	elseif lower$(right$(a$(2),1)) = "s" then
+		AllDesktops = 1
+		Quadrant = int(ran(5)) 
+		Return Quadrant
+	elseif val(right$(a$(2),1))>4 then
+		AllDesktops = 1
+		Quadrant = val(right$(a$(2),1)) -5
+		Return Quadrant
+	elseif  val(right$(a$(2),1)) < 0 or  val(right$(a$(2),1)) > 4 
+		print "Quadrant specified out of bounds. Defaulting to Centred (-q0)."
+		return 0
+	else
+		Quadrant = val(right$(a$(2),1))
+		Return Quadrant
+	endif
+end sub
+

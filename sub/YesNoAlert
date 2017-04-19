@@ -1,0 +1,39 @@
+sub YesNoAlert()
+	local XOrigin, YOrigin, XWidth, YHeight, lines,YesButtonText$, NoButtonText$, BothButtons$, numbuttons
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 275
+	YHeight = 45
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	YesButtonText$ = "Yes"
+	NoButtonText$ = "No"
+	if lower$(a$(3)) = "-b0" then
+		YesButtonText$ = "✔" 
+		NoButtonText$ = "✘"
+	endif
+	if left$(lower$(a$(3)),3) = "-b2" then
+		BothButtons$ = mid$(a$(3),4)
+		dim z$(1)
+		numbuttons = token(BothButtons$,z$(),"=")
+		YesButtonText$ = z$(1)
+		NoButtonText$ = z$(2)
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "YesNoAlertWindow", ""
+	shortcut "YesNoAlertWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"YesNoAlertWindow"
+	Window set "YesNoAlertWindow", "look", "modal"
+	Window set "YesNoAlertWindow", "flags", "not-resizable"
+	Window set "YesNoAlertWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "YesNoAlertWindow", "Workspace", "all"
+	button XWidth - (YHeight + 30), 1 to XWidth-1,YHeight/2 -1, "YesButton",YesButtonText$, "YesNoAlertWindow" 
+	button XWidth - (YHeight + 30), YHeight/2  to XWidth-1,YHeight-1, "NoButton", NoButtonText$, "YesNoAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 31),YHeight -1, "YesNoAlertText", 0, "YesNoAlertWindow"
+	textedit set "YesNoAlertText", "wordwrap", 1
+	textedit set "YesNoAlertText", "editable", 0
+	textedit add "YesNoAlertText", a$(4)
+	textedit color "YesNoAlertText", "bgcolor", red, green, blue
+end sub
+

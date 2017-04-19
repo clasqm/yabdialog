@@ -1,0 +1,86 @@
+
+//Yabadabbadoo notification
+########DO NOT RENAME THIS FILE!########
+//Yabadabbadoo needs it to function.
+
+//Main Message Loop
+dim msg$(1)
+while(not leavingLoop)
+	nCommands = token(message$, msg$(), "|")
+	for everyCommand = 1 to nCommands
+		if(DEBUG and msg$(everyCommand)<>"") print msg$(everyCommand)
+		switch(msg$(everyCommand))
+			case "_QuitRequested"
+				exit 1
+				break
+			case "SimpleAlertButton"
+				window close "SimpleAlertWindow"
+				exit 0
+				break
+			case "YesButton"
+				print "yes"
+				exit 0
+				break
+			case "NoButton"
+				print "no"
+				exit 0
+				break
+			case "OKButton"
+				print "ok"
+				exit 0
+				break
+			case "CancelButton"
+				print "cancel"
+				exit 0
+				break
+			case "EditorWindow:_QuitRequested"
+				window close "EditorWindow"
+				exit 1
+				break
+			case "GetTextButton"
+				print textedit get$ "EditorText"
+				exit 0
+				break
+			case "GetTextEditButton"
+				print textcontrol get$ "EditorText"
+				exit 0
+				break
+			case "CalendarWindow:_QuitRequested"
+				window close "CalendarWindow"
+				exit 1
+				break
+			case "CalendarButton"
+				print calendar get$ "CalendarWidget"
+				exit 0
+				break
+			case "RadioWindow:_QuitRequested"
+				window close "RadioWindow"
+				exit 1
+				break
+			case "RadioOKButton"
+				print radio
+				exit 0
+				break
+			case "GraphicWindow:_QuitRequested"
+			case "GraphicMainButton"
+			case "GraphicLittleButton"
+				window close "GraphicWindow"
+				exit 0
+				break
+			case "ProgressBarWindow:_QuitRequested"
+				window close "ProgressBarWindow"
+				exit 1
+				break
+			default
+				break
+		end switch
+	if left$(msg$(everyCommand),5) = "Radio" then
+		radio = val(right$(msg$(everyCommand),1))
+	endif
+	next everyCommand
+	if ProgressBarExist = 1 then
+		wait .2
+		ProgressButtons()
+	endif 
+wend
+

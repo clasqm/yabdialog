@@ -1,0 +1,25 @@
+sub CalendarBox()
+	local XOrigin, YOrigin, XWidth, YHeight, CalendarButtonText$
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 150
+	YHeight = 30
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	CalendarButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" then
+		CalendarButtonText$ = "✔" 
+	endif
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "CalendarWindow", ""
+	shortcut "CalendarWindow","AQ", "_QuitRequested" 
+	draw set "BGColor", red,green,blue,"CalendarWindow"
+	Window set "CalendarWindow", "look", "floating"
+	Window set "CalendarWindow", "flags", "not-resizable"
+	Window set "CalendarWindow", "flags", "not-zoomable"
+	Window set "CalendarWindow", "flags", "accept-first-click"
+	if AllDesktops = 1 window set "CalendarWindow", "Workspace", "all"
+	calendar 5,5, "CalendarWidget", a$(4), "", "CalendarWindow"
+	button XWidth - 35,5 to XWidth - 5, YHeight -5, "CalendarButton", CalendarButtonText$, "CalendarWindow"
+	RenameWindow("CalendarWindow", 5)
+end sub
+

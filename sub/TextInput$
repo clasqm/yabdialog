@@ -1,0 +1,23 @@
+sub TextInput$()
+	local XOrigin, YOrigin, XWidth, YHeight, GetTextButtonText$,ButtonOffset, a$
+	if val(right$(a$(2),1))>2 then
+		a$(2) = "-q0"
+	end if
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = PEEK("DesktopHeight")/2
+	XWidth = 300
+	YHeight = 55
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY/2
+	ButtonOffset = 30
+	GetTextButtonText$ = "OK"
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
+	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", a$(4)
+	draw set "BGColor", red,green,blue,"EditorWindow"
+	Window set "EditorWindow", "flags", "not-zoomable, not-resizable, accept-first-click"
+	textcontrol 1,1 to XWidth,YHeight - ButtonOffset, "EditorText", "", "","EditorWindow"
+	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "GetTextEditButton", GetTextButtonText$, "EditorWindow"
+		RenameWindow("EditorWindow", 6)
+end sub
+

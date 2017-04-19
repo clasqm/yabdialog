@@ -1,0 +1,239 @@
+sub ShowHelp()
+	print ProgramName$ + " " + ProgramVersion$
+	print "by " + AuthorName$ 
+	Print 
+	print "yabdialog is a CLI utility that displays a variety of dialogs, alerts and panels"
+	print "with more control over color and placement than you get with the standard"
+	print "Haiku alert and filepanel commands. It also contains additional widgets."
+	print
+	print "The yabdialog command should be  callable from any scripting language that "
+	print "can issue a SYSTEM call and receive string data back from standard input."
+	print
+	print "All parameters must be supplied, in the correct order. Some error-checking"
+	print "is performed, but things will get unpredictable if you swop parameters. On"
+	print "the bright side, all parameters are case-insensitive."
+	print
+	print "Usage: yabdialog <widget> <common-options> <specific-options>"
+	print "yabdialog --colorcontrol white|yellow|red|blue|green|purple|boring"
+	print "yabdialog --colorcontrol custom <red> <green> <blue>"
+	print
+	print "WIDGETS"
+	print "   -s\t--SimpleAlert: A simple fixed-size Alert box with a"
+	print "\t\tsingle OK Button. Good for 140 characters, after"
+	print "\t\twhich the message will be truncated."
+	print "\t\tReturns: Nothing"
+	
+	print "   -y\t--YesNoAlert: A simple fixed-size Alert box with 2"
+	print "\t\tbuttons for Yes and No. Good for 140 characters,"
+	print "\t\tafter which the message will be truncated."
+	print "\t\tReturns: \"yes\" or \"no\""
+	
+	print "   -o\t--OKCancelAlert: Like YesNoAlert, but with buttons "
+	print" \t\tthat read OK and Cancel"
+	print "\t\tReturns: \"ok\" or \"cancel\""
+	
+	print "   -e\t--Editor: A multiline text editing box. Cut and paste"
+	print "\t\tis available via a right-click"
+	print "\t\tReturns: Contents of the edited text"
+
+	print "   -t\t--TextInput: A single-line text editing box. Cut and paste"
+	print "\t\tis available via a right-click"
+	print "\t\tReturns: Contents of the edited text"
+	
+	print "   -c\t--Calendar: Displays a calendar widget."
+	print "\t\tReturns: The selected date in the specified format."
+	
+	print "   -r\t--RadioBox: Create a window with up to 5 radiobuttons"
+	print "\t\tReturns: the number of the selected button. If nothing was"
+	print "\t\tselected, 0 is returned."
+	
+	print "   -g\t--GraphicBox: Displays a window with a 300x300 graphic."
+	print "\t\tReturns: Nothing"
+	
+	print "   -p\t--ProgressBar: Displays the progress of an action in 10% increments."
+	print "\t\tReturns: \"cancel\" if cancelled by user, otherwise nothing"
+	
+	print "   -x\t--CopyToClipboard: copy supplied text to system clipboard."
+	print"\t\tBuilt-in alias: --Copy2Clipboard"
+	print "\t\tReturns: Nothing"
+	
+	print "   -v\t--GetClipboard: Retrieve text clipboard contents."
+	print "\t\tReturns: Clipboard content if that consists of text, otherwise"
+	print "\t\treturns an empty string"
+	
+	print "   -z\t--ViewClipboard:Display current text clipboard contents in a"
+	print "\t\tSimpleAlert window."
+	print "\t\tReturns: Nothing"
+	
+	print "   \t--ColorControl: Sets the color in which widgets will be displayed."
+	print "\t\tReturns: Nothing"
+	
+	print "   \t--MakeContact: Send me an email about yabdialog."
+			
+	print "   -h\t--help: This HELP information."
+	
+	print "\t--about: Display an ABOUT dialog."
+	print
+	print "   -h > yabdialog.txt\tsave this help data to a text file."
+	PRINT
+	print "COMMON OPTIONS"
+	print
+	Print "These options are compulsory and must precede specific options."
+	print "Options cannot be concatenated or omitted and must be entered in order."
+	print
+	print "-q[0-9|r|s]\tSet the quadrant in which to display a widget."
+	print "\t\t-q0 - centered"
+	print "\t\t-q1 - top left"
+	print "\t\t-q2 - top right"
+	print "\t\t-q3 - bottom right"
+	print "\t\t-q4 - bottom left"
+	print "\t\t-q5 - centered on all desktops"
+	print "\t\t-q6 - top left on all desktops"
+	print "\t\t-q7 - top right on all desktops"
+	print "\t\t-q8 - bottom right on all desktops"
+	print "\t\t-q9 - bottom left on all desktops"
+	print "\t\t-qr - random position on current desktop"
+	print "\t\t-qs - random position on all desktops"
+	print "the r and s parameters are experimental and not recommended."
+	print
+	print "   -b[0|1|2]\"|Message text\""
+	print "\t\t-b0 Graphical button with checkmark"
+	print "\t\t-b1Text button with \"OK\""
+	print "\t\t-b2USERTEXT Text button with user-supplied text [1]"
+	print
+	
+	print "SPECIFIC OPTIONS"
+	print
+	print "Specific options must be entered after the common options. Options"
+	print "can not be concatenated or omitted and must be entered in order."
+	print
+	print "SIMPLEALERT"
+	print "yabdialog -o <common-options> <text>"
+		print "Example: yabdialog -s -q1 -b1 \"Click OK to make this message go away\""
+	print "Example: yabdialog -s -q1 -b2Ja \"Spreekt u Nederlands?\""
+	print "Example: yabdialog -s -q1 -b2☻ \"Smile! It's a beautiful day.\""
+	print
+	print "YESNOALERT"
+	print "yabdialog -y <common-options> <text>"
+	print "Example: yabdialog -y -q1 -b0 \"Will we watch football tonight?\""
+	print "Example: yabdialog -y -q1 -b1 \"Will we watch football tonight?\""
+	print "Example: yabdialog -y -q1 -b2Ja=Nee \"Spreekt u Nederlands?\""
+	print "Example: yabdialog -y -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\""
+	print "Example: yabdialog -y -q1 -b2Oui=Non \"Parlez-vous français?\""
+	print "Example: yabdialog -y -q1 -b2Si=No \"¿Habla usted español?\"[2]"
+	print
+	print "OKCANCELALERT"
+	print "yabdialog -o <common-options> <text> [3]"
+	print "Example: yabdialog -o -q1 -b0 \"Delete the whole partition?\""
+	print "Example: yabdialog -o -q1 -b1 \"Flash the BIOS?\""
+	print "Example: yabdialog -o -q1 -b2Sure=Never! \"Declare war on Linux?\""
+	print
+	print "EDITOR"
+	print "yabdialog -e <common-options> <content type> <content/file>"
+	print "Common Options: only quadrants 0-2 are available. Giving any"
+	print "higher value will cause a default to 0"
+	print "   -t <Initial Text>  OR"
+	print "   -f <Initial Filename>"
+	print "ONE of -t or -f MUST be supplied, but either the string or the file"
+	print "may be empty."  
+	print "Example: yabdialog -e -q0 -b2Insert this -t \"This is some example text\""
+	print "Example: yabdialog -e -q1 -b0 -t \"\""
+	print "Example: yabdialog -e -q2 -b1 -f \"/boot/home/.bash_history\""
+	print "This widget takes an OPTIONAL additional parameter, which becomes the"
+	print "window title printed in the tab."
+	print "Example: yabdialog -e -q1 -b1 -t \"example text\" \"The Editor\""
+	print
+	print "TEXT INPUT"
+	print "yabdialog -t <common-options> \"Tab title\""
+	print "Example: yabdialog -t -q1 -b1 \"What is your name?\""
+	print
+	Print "CALENDAR"
+	print "yabdialog -c <common-options> <date-format>"
+	print "Date format consists of either MMDDYYY or DDMMYYY, with an optional"
+	print "divider which can be one of \".\", \"/\" or \"-\". If no divider is supplied,"
+	print "\".\" will be used. The return value will be supplied in the same format." 
+	print "Example: yabdialog -c -q6 -b3 DDMMYYY-" 
+	print "This widget takes an OPTIONAL additional parameter, which becomes the"
+	print "window title printed in the tab."
+	print "Example: yabdialog -c -q0 -b0 MMDDYYY- \"Pick a date\""
+	print
+	print "RADIOBOX"
+	print"yabdialog -r <common-options> <number> <Radiobuttontext1> ..."
+	print "Number is the number of radiobuttons (1-5) you wish to create."
+	print "Radiobuttontext1 to Radiobuttontext5 contains the text to go next to"
+	print "the radiobuttons."
+	print "Example:  yabdialog -r -q6 -b1 5 Haiku GNU/Linux \"Windows 8\" FreeBSD \"I don't"
+	print "    like operating systems\" \"What is your favourite Operating System?\""
+	print
+	print"GRAPHICBOX"
+	print "yabdialog -g <common-options> <filename>"
+	print "<filename> refers to a 300x300 .PNG file. If no filename is supplied,"
+	print "yabdialog will look for the file ~/config/settings/yabdialog.png."
+	print "This is meant for splash screens. Clicking either the graphic or the"
+	print "button will dismiss the window.[5]"
+	print "Example: yabdialog -g -q3 -b0 \"/boot/home/Desktop/clip.png\""
+	print 
+	print "PROGRESSBAR"
+	print "yabdialog -p <common-options>  <windowtab text> <filename>"
+	print "<windowtab text> is the text in the window's tab."
+	print "<filename> is a file containing a number between 0 and 9, and "
+	print "nothing else, not even a newline. The program will exit when the"
+	print "value in <filename> exceeds 9"
+	print "Example: Run the following bash script"
+	print "\t#!/bin/bash"
+	print "\techo 0 > ~/Desktop/temp.txt"
+	print "\tyabdialog -p -q1 -b1 \"Counting to 10 ...\" ~/Desktop/temp.txt &"
+	print "\tfor f in `seq 1 10`;"
+	print "\tdo"
+	print "\t   echo $f > ~/Desktop/temp.txt"
+	print "\t   sleep 2"
+	print "\tdone"
+	print
+	print "COPYTOCLIPBOARD"
+	print "yabdialog -x <text to copy to clipboard>"
+	print "Example: yabdialog -x \"put this text on the clipboard, please.\""
+	print
+	print "GETCLIPBOARD"
+	print "No additional parameters required."
+	print "Example: yabdialog -v"
+	print
+	print "VIEWCLIPBOARD"
+	print "yabdialog -z <common-options>"
+	print "Example: yabdialog -z -q2 -b0"
+	print
+	print "COLORCONTROL"
+	print "yabdialog --ColorControl <color>"
+	print "where <color> is one of white, yellow, blue, red, green or boring[6]"
+	print "\tOR"
+	print "yabdialog --ColorControl custom <red> <green> <blue>"
+	print "Example: yabdialog --ColorControl white"
+	print "Example: yabdialog --ColorControl custom 240 150 200"
+	print "All NEW widgets will be created in the new color.[7]"
+	print 
+	print "MAKECONTACT"
+	print "No additional parameters required."
+	print "Example: yabdialog --MakeContact"
+	print
+	print "NOTES"
+	print "1. The -b2 parameter is not available in the following widgets:"
+	print "    Calendar, Radiobox."
+	print "2. yabdialog -y will return \"yes\" or \"no\" regardless of the button label!"
+	print "3. The following two commands:"
+	print "   yabdialog -y -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\"  and"
+	print "   yabdialog -o -q1 -b2Ja=Nein \"Sprechen Sie Deutsch?\""
+	print "    will produce identical dialogs, but present different values back"
+	print "    to the operating system or calling routine in your script language." 
+	print "4. You can put labels of more than one word on widgets. The trick"
+	print "    is to use CHR 160 rather than the normal <space> which is CHR 32."
+	print "5. Alt-Q will exit any yabdialog window and the program as a whole,"
+	print "    even in tabless windows. Dealing with the lack of a return value"
+	print "    will be your problem."
+	print "6. The color \"boring\" is the standard medium grey Haiku dialog tint,"
+	print "   i.e. r=216 g=216 b=216. It is also the starting default."
+	print "7. Color changes will persist across reboots! Remember to switch the"
+	print "   yabdialog color back to \"boring\" (see above) or to delete the file"
+	print "   /boot/home/config/settings/yabdialog.cfg when you are done." 
+	print
+	exit 0
+end sub
+

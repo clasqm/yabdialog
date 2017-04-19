@@ -1,0 +1,29 @@
+sub SimpleAlert()
+	local XOrigin, YOrigin, XWidth, YHeight,OKButton$
+	ScreenPosX = GetScreenCoords("x")
+	ScreenPosY = GetScreenCoords("y")
+	XWidth = 250
+	YHeight = 30
+	if len(a$(4))>70 YHeight = 45: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
+	XOrigin = ScreenPosX - (XWidth / 2)
+	YOrigin = ScreenPosY - (YHeight / 2)
+	OKButton$ = "OK"
+	if lower$(a$(3)) = "-b0" OKButton$ = "✔" 
+	if left$(lower$(a$(3)),3) = "-b2" OKButton$ = mid$(a$(3),4)
+	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "SimpleAlertWindow", ""
+	draw set "BGColor", red,green,blue,"SimpleAlertWindow"
+	Window set "SimpleAlertWindow", "look", "modal"
+	Window set "SimpleAlertWindow", "flags", "not-resizable"
+	Window set "SimpleAlertWindow", "flags", "accept-first-click"
+	shortcut "SimpleAlertWindow","AQ", "_QuitRequested" 
+	if AllDesktops = 1 window set "SimpleAlertWindow", "Workspace", "all"
+	button XWidth - YHeight, 2 to XWidth-2,YHeight-2, "SimpleAlertButton",OKButton$, "SimpleAlertWindow" 
+	textedit 1,1 to XWidth - (YHeight + 1),YHeight -1, "SimpleAlertText", 0, "SimpleAlertWindow"
+	textedit set "SimpleAlertText", "wordwrap", 1
+	textedit set "SimpleAlertText", "editable", 0
+	textedit add "SimpleAlertText", a$(4)
+	textedit color "SimpleAlertText", "bgcolor", red, green, blue
+end sub
+

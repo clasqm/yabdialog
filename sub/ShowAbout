@@ -1,0 +1,6 @@
+sub ShowAbout()
+	Alert ProgramName$ + " " + ProgramVersion$ + "\n" + "by " + AuthorName$ +"\n\n" + ProgramBriefDescription$ +"\n\nRunning in yab " + str$(peek("version")) + " under " + peek$("os") + "." + "\n\n" + ProgramLicense$ , "OK", "none"
+	rem + ProgramAcknowledgements$, "OK", "none"
+	exit 0
+end sub
+

@@ -1,0 +1,12 @@
+sub GetClip(printthis)
+	local clipcontent$
+	clipcontent$ = clipboard paste$
+	wait 0.1 //perhaps this will help secure the variable - it does, sometimes
+			//I'm getting weird errors here
+	if printthis = 1 then 
+		print clipcontent$
+	elseif printthis = 0 then
+		a$(4) = clipcontent$
+	endif
+end sub
+
