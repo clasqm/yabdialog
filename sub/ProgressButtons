@@ -1,9 +1,9 @@
 sub ProgressButtons()
 	static total
-	open a$(5) for reading as #1
-		line input #1 progress$
+	tempval = open(a$(5), "r")
+		line input #tempval progress$
 		progress = int(val(progress$))
-	close #1
+	close #tempval
 	if progress = total return
 	if progress > 9 or progress < 0 then 
 		window close "ProgressBarWindow"

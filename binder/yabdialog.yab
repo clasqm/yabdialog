@@ -9,6 +9,8 @@
 
 //The app formerly know as hdialog, until I found out that someone else wanted to use that name.
 //The other one is far more compatible with xdialog, it seems, so I don't mind changing mine.
+
+import libclasqm_main
  
 ##Fill in these fields with your own particulars.
 ##The variables will be used in the About Box and in naming the program.
@@ -27,9 +29,10 @@ ProgramLicense$ = "Public Domain, 2014"
 ## Technically, yab does not require you to declare global variables,
 ##It just is a really, really good idea to do it anyway.
 // set DEBUG = 1 to print out all messages on the console
-DEBUG = 0
+DEBUG = 1
 //change this to DEBUG = 0 when you are ready to bind the program for distribution
 tempval$=""
+tempval=0
 totalargs = 0 
 dim a$(10) 
 ScreenW = 1024 
@@ -50,17 +53,18 @@ radio = 0
 ## Commands to run before the Main Loop come here.
 ## e.g. setting up a window with a menu.
 
-if (not open(1,ConfigFile$)) then
+if FileExists(ConfigFile$) = 0 then
 	red=216
 	green=216
 	blue=216
 else
-	line input #1 tempval$: red = val(tempval$)
-	line input #1 tempval$: green = val(tempval$)
-	line input #1 tempval$: blue = val(tempval$)
-	tempval$=""
+	tempval = open(ConfigFile$, "r")
+	line input #tempval tempval$: red = val(tempval$)
+	line input #tempval tempval$: green = val(tempval$)
+	line input #tempval tempval$: blue = val(tempval$)
+	tempval$ = ""
+	close#tempval
 endif
-close #1
 
 totalargs = peek("argument") 
 
@@ -220,13 +224,13 @@ sub Editor$()
 			textedit add "EditorText", a$(5)
 		elseif lower$(a$(4)) = "-f" then
 			print a$(5)
-			open a$(5) for reading as #1
+			tempval = open(a$(5), "r")
 			while (not EOF(1))
-				line input #1 a$
+				line input #tempval a$
 				textedit add "EditorText", a$
 				textedit add "EditorText", chr$(10)
 			wend
-			close #1 
+			close #tempval 
 		end if
 	end if
 	RenameWindow("EditorWindow", 6)
@@ -419,10 +423,10 @@ end sub
 
 sub ProgressButtons()
 	static total
-	open a$(5) for reading as #1
-		line input #1 progress$
+	tempval = open(a$(5), "r")
+		line input #tempval progress$
 		progress = int(val(progress$))
-	close #1
+	close #tempval
 	if progress = total return
 	if progress > 9 or progress < 0 then 
 		window close "ProgressBarWindow"
@@ -509,11 +513,11 @@ sub SetColors()
 		green = 216
 		blue = 216
 	endif
-	open ConfigFile$ for writing as #1
-		print #1 red
-		print #1 green
-		print #1 blue
-	close #1
+	tempval = open(ConfigFile$, "w")
+		print #tempval red
+		print #tempval green
+		print #tempval blue
+	close #tempval
 	print "yabdialog colors changed to " + str$(red) + " " + str$(green) + " " + str$(blue)
 	exit 0
 end sub

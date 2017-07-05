@@ -34,11 +34,11 @@ sub SetColors()
 		green = 216
 		blue = 216
 	endif
-	open ConfigFile$ for writing as #1
-		print #1 red
-		print #1 green
-		print #1 blue
-	close #1
+	tempval = open(ConfigFile$, "w")
+		print #tempval red
+		print #tempval green
+		print #tempval blue
+	close #tempval
 	print "yabdialog colors changed to " + str$(red) + " " + str$(green) + " " + str$(blue)
 	exit 0
 end sub

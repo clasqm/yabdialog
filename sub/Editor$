@@ -23,13 +23,13 @@ sub Editor$()
 			textedit add "EditorText", a$(5)
 		elseif lower$(a$(4)) = "-f" then
 			print a$(5)
-			open a$(5) for reading as #1
+			tempval = open(a$(5), "r")
 			while (not EOF(1))
-				line input #1 a$
+				line input #tempval a$
 				textedit add "EditorText", a$
 				textedit add "EditorText", chr$(10)
 			wend
-			close #1 
+			close #tempval 
 		end if
 	end if
 	RenameWindow("EditorWindow", 6)
