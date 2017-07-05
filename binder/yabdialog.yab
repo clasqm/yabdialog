@@ -17,10 +17,9 @@ import libclasqm_main
  
 ProgramName$ = "yabdialog"
 AuthorName$ = "Michel Clasquin-Johnson <clasqm@gmail.com>"
-ProgramVersion$ = "v0.1"
+ProgramVersion$ = "v0.2"
 ProgramBriefDescription$ = "A CLI program to create alerts and dialog boxes. Like xdialog in Linux or CocoaDialog in OSX, but not compatible with either. Use the command\n\tyabdialog --help\nfor instructions on usage, or the command\n\tyabdialog --help > yabdialog.txt\nto save instructions to a text file.\nTo see a demo, use the command\n\tyabdialog-demo"
-ProgramLicense$ = "Public Domain, 2014"
-//ProgramAcknowledgements$ ="With thanks to ......."
+ProgramLicense$ = "Public Domain, 2014-2017"
  
 //*************************
 //*****Global Variables****
@@ -29,7 +28,7 @@ ProgramLicense$ = "Public Domain, 2014"
 ## Technically, yab does not require you to declare global variables,
 ##It just is a really, really good idea to do it anyway.
 // set DEBUG = 1 to print out all messages on the console
-DEBUG = 1
+DEBUG = 0
 //change this to DEBUG = 0 when you are ready to bind the program for distribution
 tempval$=""
 tempval=0
@@ -179,7 +178,7 @@ sub CalendarBox()
 	YOrigin = ScreenPosY - (YHeight / 2)
 	CalendarButtonText$ = "OK"
 	if lower$(a$(3)) = "-b0" then
-		CalendarButtonText$ = "✔" 
+		CalendarButtonText$ = "=>" 
 	endif
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "CalendarWindow", ""
 	shortcut "CalendarWindow","AQ", "_QuitRequested" 
@@ -192,11 +191,6 @@ sub CalendarBox()
 	calendar 5,5, "CalendarWidget", a$(4), "", "CalendarWindow"
 	button XWidth - 35,5 to XWidth - 5, YHeight -5, "CalendarButton", CalendarButtonText$, "CalendarWindow"
 	RenameWindow("CalendarWindow", 5)
-end sub
-
-sub CloseWindow()
-	//Close down the main window
-	window close "MainWindow"
 end sub
 
 sub Editor$()
@@ -212,7 +206,7 @@ sub Editor$()
 	YOrigin = ScreenPosY/2
 	ButtonOffset = 30
 	GetTextButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
 	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", ""
 	draw set "BGColor", red,green,blue,"EditorWindow"
@@ -327,7 +321,7 @@ sub GraphicBox()
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	GraphicButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" GraphicButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" GraphicButtonText$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" GraphicButtonText$ = mid$(a$(3),4)
 	if a$(4) = "" then
 		GraphicFile$ = "/boot/home/config/settings/yabdialog.png"
@@ -355,18 +349,18 @@ sub OKCancelAlert()
 	local XOrigin, YOrigin, XWidth, YHeight, lines,OKButtonText$, CancelButtonText$, BothButtons$, numbuttons
 	ScreenPosX = GetScreenCoords("x")
 	ScreenPosY = GetScreenCoords("y")
-	XWidth = 275
-	YHeight = 45
-//	print len(a$(4))
-	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+		XWidth = 300
+	YHeight = 40
+	if len(a$(4))>70 YHeight = YHeight + 20: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = YHeight + 20: XWidth = XWidth + 25
 	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	OKButtonText$ = "OK"
 	CancelButtonText$ = "Cancel"
 	if lower$(a$(3)) = "-b0" then
-		OKButtonText$ = "✔" 
-		CancelButtonText$ = "✘"
+		OKButtonText$ = "=>" 
+		CancelButtonText$ = "X"
 	endif
 	if left$(lower$(a$(3)),3) = "-b2" then
 		BothButtons$ = mid$(a$(3),4)
@@ -391,12 +385,6 @@ sub OKCancelAlert()
 	textedit color "OKCancelAlertText", "bgcolor", red, green, blue
 end sub
 
-sub OpenWindow()
-	//Setup the main window here
-	window open 100,100 to 600,500, "MainWindow", "Main Window"
-	MakeMenu()
-end sub
-
 sub ProgressBar()
 	local XOrigin, YOrigin, XWidth, YHeight,OKButton$, progress, progress$
 	ProgressBarExist = 1
@@ -407,7 +395,7 @@ sub ProgressBar()
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	CancelButton$ = "Cancel"
-	if lower$(a$(3)) = "-b0" CancelButton$ = "✘" 
+	if lower$(a$(3)) = "-b0" CancelButton$ = "X" 
 	if left$(lower$(a$(3)),3) = "-b2" CancelButton$ = mid$(a$(3),4)
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "ProgressBarWindow", a$(4)
 	draw set "BGColor", red,green,blue,"ProgressBarWindow"
@@ -452,7 +440,7 @@ sub RadioBox()
 	YOrigin = ScreenPosY - (YHeight / 2)
 	ButtonOffset = 25
 		RadioOKButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "=>" 
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "RadioWindow",""
 	//shortcut "RadioWindow","AQ", "_QuitRequested"
 	draw set "BGColor", red,green,blue,"RadioWindow"
@@ -627,7 +615,7 @@ sub ShowHelp()
 	print "the r and s parameters are experimental and not recommended."
 	print
 	print "   -b[0|1|2]\"|Message text\""
-	print "\t\t-b0 Graphical button with checkmark"
+	print "\t\t-b0 Graphical button with => for yes and X for no (where appropriate)"
 	print "\t\t-b1Text button with \"OK\""
 	print "\t\t-b2USERTEXT Text button with user-supplied text [1]"
 	print
@@ -771,15 +759,15 @@ sub SimpleAlert()
 	local XOrigin, YOrigin, XWidth, YHeight,OKButton$
 	ScreenPosX = GetScreenCoords("x")
 	ScreenPosY = GetScreenCoords("y")
-	XWidth = 250
-	YHeight = 30
-	if len(a$(4))>70 YHeight = 45: XWidth = XWidth + 25
-	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	XWidth = 300
+	YHeight = 40
+	if len(a$(4))>70 YHeight = YHeight + 20: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = YHeight + 20: XWidth = XWidth + 25
 	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	OKButton$ = "OK"
-	if lower$(a$(3)) = "-b0" OKButton$ = "✔" 
+	if lower$(a$(3)) = "-b0" OKButton$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" OKButton$ = mid$(a$(3),4)
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "SimpleAlertWindow", ""
 	draw set "BGColor", red,green,blue,"SimpleAlertWindow"
@@ -809,14 +797,14 @@ sub TextInput$()
 	YOrigin = ScreenPosY/2
 	ButtonOffset = 30
 	GetTextButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
 	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", a$(4)
 	draw set "BGColor", red,green,blue,"EditorWindow"
 	Window set "EditorWindow", "flags", "not-zoomable, not-resizable, accept-first-click"
 	textcontrol 1,1 to XWidth,YHeight - ButtonOffset, "EditorText", "", "","EditorWindow"
 	button XWidth/4, YHeight - ButtonOffset +3 to XWidth * 0.75, YHeight - 1, "GetTextEditButton", GetTextButtonText$, "EditorWindow"
-		RenameWindow("EditorWindow", 6)
+	RenameWindow("EditorWindow", 6)
 end sub
 
 sub WhatWidget()
@@ -896,17 +884,18 @@ sub YesNoAlert()
 	local XOrigin, YOrigin, XWidth, YHeight, lines,YesButtonText$, NoButtonText$, BothButtons$, numbuttons
 	ScreenPosX = GetScreenCoords("x")
 	ScreenPosY = GetScreenCoords("y")
-	XWidth = 275
-	YHeight = 45
-	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+	XWidth = 300
+	YHeight = 40
+	if len(a$(4))>70 YHeight = YHeight + 20: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = YHeight + 20: XWidth = XWidth + 25
 	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	YesButtonText$ = "Yes"
 	NoButtonText$ = "No"
 	if lower$(a$(3)) = "-b0" then
-		YesButtonText$ = "✔" 
-		NoButtonText$ = "✘"
+		YesButtonText$ = "=>" 
+		NoButtonText$ = "X"
 	endif
 	if left$(lower$(a$(3)),3) = "-b2" then
 		BothButtons$ = mid$(a$(3),4)

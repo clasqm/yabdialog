@@ -8,7 +8,7 @@ sub CalendarBox()
 	YOrigin = ScreenPosY - (YHeight / 2)
 	CalendarButtonText$ = "OK"
 	if lower$(a$(3)) = "-b0" then
-		CalendarButtonText$ = "✔" 
+		CalendarButtonText$ = "=>" 
 	endif
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "CalendarWindow", ""
 	shortcut "CalendarWindow","AQ", "_QuitRequested" 

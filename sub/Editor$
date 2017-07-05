@@ -11,7 +11,7 @@ sub Editor$()
 	YOrigin = ScreenPosY/2
 	ButtonOffset = 30
 	GetTextButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" GetTextButtonText$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" GetTextButtonText$ = mid$(a$(3),4)
 	window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "EditorWindow", ""
 	draw set "BGColor", red,green,blue,"EditorWindow"

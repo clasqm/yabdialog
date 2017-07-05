@@ -17,10 +17,9 @@ import libclasqm_main
  
 ProgramName$ = "yabdialog"
 AuthorName$ = "Michel Clasquin-Johnson <clasqm@gmail.com>"
-ProgramVersion$ = "v0.1"
+ProgramVersion$ = "v0.2"
 ProgramBriefDescription$ = "A CLI program to create alerts and dialog boxes. Like xdialog in Linux or CocoaDialog in OSX, but not compatible with either. Use the command\n\tyabdialog --help\nfor instructions on usage, or the command\n\tyabdialog --help > yabdialog.txt\nto save instructions to a text file.\nTo see a demo, use the command\n\tyabdialog-demo"
-ProgramLicense$ = "Public Domain, 2014"
-//ProgramAcknowledgements$ ="With thanks to ......."
+ProgramLicense$ = "Public Domain, 2014-2017"
  
 //*************************
 //*****Global Variables****
@@ -29,7 +28,7 @@ ProgramLicense$ = "Public Domain, 2014"
 ## Technically, yab does not require you to declare global variables,
 ##It just is a really, really good idea to do it anyway.
 // set DEBUG = 1 to print out all messages on the console
-DEBUG = 1
+DEBUG = 0
 //change this to DEBUG = 0 when you are ready to bind the program for distribution
 tempval$=""
 tempval=0

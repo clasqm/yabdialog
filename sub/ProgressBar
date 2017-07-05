@@ -8,7 +8,7 @@ sub ProgressBar()
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	CancelButton$ = "Cancel"
-	if lower$(a$(3)) = "-b0" CancelButton$ = "✘" 
+	if lower$(a$(3)) = "-b0" CancelButton$ = "X" 
 	if left$(lower$(a$(3)),3) = "-b2" CancelButton$ = mid$(a$(3),4)
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "ProgressBarWindow", a$(4)
 	draw set "BGColor", red,green,blue,"ProgressBarWindow"

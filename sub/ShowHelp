@@ -97,7 +97,7 @@ sub ShowHelp()
 	print "the r and s parameters are experimental and not recommended."
 	print
 	print "   -b[0|1|2]\"|Message text\""
-	print "\t\t-b0 Graphical button with checkmark"
+	print "\t\t-b0 Graphical button with => for yes and X for no (where appropriate)"
 	print "\t\t-b1Text button with \"OK\""
 	print "\t\t-b2USERTEXT Text button with user-supplied text [1]"
 	print

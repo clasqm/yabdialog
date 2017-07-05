@@ -2,18 +2,18 @@ sub OKCancelAlert()
 	local XOrigin, YOrigin, XWidth, YHeight, lines,OKButtonText$, CancelButtonText$, BothButtons$, numbuttons
 	ScreenPosX = GetScreenCoords("x")
 	ScreenPosY = GetScreenCoords("y")
-	XWidth = 275
-	YHeight = 45
-//	print len(a$(4))
-	if len(a$(4))>105 YHeight = 60: XWidth = XWidth + 25
+		XWidth = 300
+	YHeight = 40
+	if len(a$(4))>70 YHeight = YHeight + 20: XWidth = XWidth + 25
+	if len(a$(4))>105 YHeight = YHeight + 20: XWidth = XWidth + 25
 	if len(a$(4))>140 a$(4) = left$(a$(4), 140)
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	OKButtonText$ = "OK"
 	CancelButtonText$ = "Cancel"
 	if lower$(a$(3)) = "-b0" then
-		OKButtonText$ = "✔" 
-		CancelButtonText$ = "✘"
+		OKButtonText$ = "=>" 
+		CancelButtonText$ = "X"
 	endif
 	if left$(lower$(a$(3)),3) = "-b2" then
 		BothButtons$ = mid$(a$(3),4)

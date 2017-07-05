@@ -7,7 +7,7 @@ sub GraphicBox()
 	XOrigin = ScreenPosX - (XWidth / 2)
 	YOrigin = ScreenPosY - (YHeight / 2)
 	GraphicButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" GraphicButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" GraphicButtonText$ = "=>" 
 	if left$(lower$(a$(3)),3) = "-b2" GraphicButtonText$ = mid$(a$(3),4)
 	if a$(4) = "" then
 		GraphicFile$ = "/boot/home/config/settings/yabdialog.png"

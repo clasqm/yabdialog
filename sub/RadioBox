@@ -10,7 +10,7 @@ sub RadioBox()
 	YOrigin = ScreenPosY - (YHeight / 2)
 	ButtonOffset = 25
 		RadioOKButtonText$ = "OK"
-	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "✔" 
+	if lower$(a$(3)) = "-b0" RadioOKButtonText$ = "=>" 
 	Window open XOrigin, YOrigin to XOrigin + XWidth, YOrigin + YHeight, "RadioWindow",""
 	//shortcut "RadioWindow","AQ", "_QuitRequested"
 	draw set "BGColor", red,green,blue,"RadioWindow"
