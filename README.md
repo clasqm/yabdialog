@@ -8,3 +8,6 @@ yabdialog is a CLI utility that displays a variety of dialogs, alerts and panels
 This utility was once known as hdialog, but I found out someone else was using the name. I'm not interested in getting into a big fight over who used it first, and the other one looks more compatable with xdialog, so I'm changing the name of my app. If you have been using my version of hdialog in your scripts, please uninstall that and change all references in your scripts to yabdialog.
 
 Get it here: https://github.com/clasqm/yabdialog
+
+Binaries: https://sourceforge.net/p/hdialogforhaiku/
+
